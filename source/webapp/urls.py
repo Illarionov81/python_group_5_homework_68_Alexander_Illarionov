@@ -17,7 +17,7 @@ urlpatterns = [
             path('comments/add/', ArticleCommentCreateView.as_view(),
                  name='article_comment_add'),
             path('like/', ArticleLikeView.as_view(), name='article_like'),
-            path('like/', ArticleUnLikeView.as_view(), name='article_unlike'),
+            path('unlike/', ArticleUnLikeView.as_view(), name='article_unlike'),
         ])),
 
         path('add/', ArticleCreateView.as_view(), name='article_create'),

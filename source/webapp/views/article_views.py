@@ -160,7 +160,7 @@ class ArticleDeleteView(UserPassesTestMixin, DeleteView):
             self.get_object().author == self.request.user
 
 
-class ArticleLikeView(View):
+class ArticleLikeView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         article = get_object_or_404(Article, pk=kwargs.get('pk'))
         like, created = ArticleLike.objects.get_or_create(article=article, user=request.user)
@@ -172,10 +172,11 @@ class ArticleLikeView(View):
             return HttpResponseForbidden()
 
 
-class ArticleUnLikeView(View):
+class ArticleUnLikeView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         article = get_object_or_404(Article, pk=kwargs.get('pk'))
         like = get_object_or_404(article.likes, user=request.user)
+        print(like)
         like.delete()
         article.like_count -= 1
         article.save()

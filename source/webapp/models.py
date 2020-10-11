@@ -79,7 +79,7 @@ class ArticleLike(models.Model):
                                 related_name='likes', verbose_name='Статья')
 
     def __str__(self):
-        return f'{self.user.name} - {self.article.title}'
+        return f'{self.user} - {self.article.title}'
 
     class Meta:
         verbose_name = 'Лайк'
