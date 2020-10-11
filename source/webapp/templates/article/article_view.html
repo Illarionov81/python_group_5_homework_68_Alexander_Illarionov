@@ -50,6 +50,15 @@
                 {% if perms.webapp.delete_comment or comment.author == request.user %}
                     <p><a href="{% url 'webapp:comment_delete' comment.pk %}">Delete</a></p>
                 {% endif %}
+                   {% if user.is_authenticated %}
+                        <p>
+                            <span class="counter">{{ comment.like_count }}</span>
+                            {% with comment|liked_by:user as like %}
+                                <a class="{% if like %}hidden{% endif %} like" href="{% url 'webapp:comment_like' comment.pk %}">Like</a>
+                                <a class="{% if not like %}hidden{% endif %} unlike" href="{% url 'webapp:comment_unlike' comment.pk %}">Unlike</a>
+                            {% endwith %}
+                        </p>
+                    {% endif %}
             </div>
         {% empty %}
             <p>Нет комментариев</p>

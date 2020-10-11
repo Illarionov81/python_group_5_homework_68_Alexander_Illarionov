@@ -54,6 +54,11 @@ class Comment(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name='Время изменения')
     like_count = models.IntegerField(verbose_name="Счётчик лайков", default=0)
 
+
+    def liked_by(self, user):
+        likes = self.likes.filter(user=user)
+        return likes.count() > 0
+
     def __str__(self):
         return self.text[:20]
 
