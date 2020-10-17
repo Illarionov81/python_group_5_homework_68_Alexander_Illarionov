@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 import json
-from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse
+from django.http import HttpResponse, HttpResponseNotAllowed, JsonResponse, HttpResponseBadRequest
 from django.views.generic import View
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -24,13 +24,37 @@ class ArticleListView(View):
 
 class ArticleDetailView(View):
     def get(self, request, *args, **kwargs):
-        print(self.kwargs.get('pk'))
         article = get_object_or_404(Article, pk=self.kwargs.get('pk'))
         srl = ArticleSerializer(article)
         return JsonResponse(srl.data)
 
 
+class ArticleUpdateView(View):
+    def get(self, request, *args, **kwargs):
+        article = get_object_or_404(Article, pk=self.kwargs.get('pk'))
+        srl = ArticleSerializer(article)
+        return JsonResponse(srl.data)
+
+    def post(self, request, *args, **kwargs):
+        answer = {}
+        article = get_object_or_404(Article, pk=self.kwargs.get('pk'))
+        try:
+            data = json.loads(request.body)
+            slr = ArticleSerializer(data=data, instance=article)
+            if slr.is_valid():
+                article = slr.save()
+                return JsonResponse(slr.data, safe=False)
+            else:
+                response = JsonResponse(slr.errors, safe=False)
+                response.status_code = 400
+                return response
+        except Exception as e:
+            response = HttpResponseBadRequest(e)
+        return response
+
+
 class ArticleCreateView(View):
+
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
         slr = ArticleSerializer(data=data)
