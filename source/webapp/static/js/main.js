@@ -1,8 +1,35 @@
-async function makeRequest(url, method='GET') {
-    let response = await fetch(url, {method});
+const BASE_URL = 'http://localhost:8000/api/v1/';
 
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        let cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            let cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function csrfSafeMethod(method) {
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+async function makeRequest(url, method='GET', data=undefined) {
+    let opts = {method, headers: {}};
+    if (!csrfSafeMethod(method))
+        opts.headers['X-CSRFToken'] = getCookie('csrftoken');
+    if (data) {
+        opts.headers['Content-Type'] = 'application/json';
+        opts.body = JSON.stringify(data);
+    }
+    let response = await fetch(url, opts);
     if (response.ok) {  // нормальный ответ
-        return await response.text();
+        return response.json();
     } else {            // ошибка
         let error = new Error(response.statusText);
         error.response = response;
@@ -16,7 +43,7 @@ async function onLike(event) {
     let url = likeBtn.href;
 
     try {
-        let response = await makeRequest(url);
+        let response = await makeRequest(url, 'POST');
         console.log(response);
         const counter = likeBtn.parentElement.getElementsByClassName('counter')[0];
         counter.innerText = response;
@@ -36,7 +63,7 @@ async function onUnlike(event) {
     let url = unlikeBtn.href;
 
     try {
-        let response = await makeRequest(url);
+        let response = await makeRequest(url, 'DELETE');
         console.log(response);
         const counter = unlikeBtn.parentElement.getElementsByClassName('counter')[0];
         counter.innerText = response;
