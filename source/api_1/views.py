@@ -58,6 +58,7 @@ class ArticleCreateView(View):
         slr = ArticleSerializer(data=data)
         if slr.is_valid():
             article = slr.save()
+            # return render(request, 'article/article_view.html', context={'article': article})
             return JsonResponse(slr.data, safe=False)
         else:
             response = JsonResponse(slr.errors, safe=False)
@@ -66,6 +67,15 @@ class ArticleCreateView(View):
 
 
 class ArticleDeleteView(View):
+    def dispatch(self, request, *args, **kwargs):
+        answer = {}
+        if request.method != 'DELETE':
+            answer['error 405'] = "Not Allowed Method"
+            response = JsonResponse(answer)
+            response.status_code = 405
+            return response
+        return super().dispatch(request, *args, **kwargs)
+
     def delete(self, request, *args, **kwargs):
         article_id = self.kwargs.get('pk')
         article = get_object_or_404(Article, pk=article_id)
