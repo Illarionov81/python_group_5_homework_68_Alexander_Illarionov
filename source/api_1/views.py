@@ -16,6 +16,15 @@ def get_token_view(request, *args, **kwargs):
 
 
 class ArticleListView(View):
+    def dispatch(self, request, *args, **kwargs):
+        answer = {}
+        if request.method !='GET':
+            answer['error 405'] = "Not Allowed Method"
+            response = JsonResponse(answer)
+            response.status_code = 405
+            return response
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         objects = Article.objects.all()
         slr = ArticleSerializer(objects, many=True)
@@ -23,6 +32,16 @@ class ArticleListView(View):
 
 
 class ArticleDetailView(View):
+
+    def dispatch(self, request, *args, **kwargs):
+        answer = {}
+        if request.method != 'GET':
+            answer['error 405'] = "Not Allowed Method"
+            response = JsonResponse(answer)
+            response.status_code = 405
+            return response
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         article = get_object_or_404(Article, pk=self.kwargs.get('pk'))
         srl = ArticleSerializer(article)
@@ -30,6 +49,15 @@ class ArticleDetailView(View):
 
 
 class ArticleUpdateView(View):
+    def dispatch(self, request, *args, **kwargs):
+        answer = {}
+        if request.method not in ('POST', 'GET'):
+            answer['error 405'] = "Not Allowed Method"
+            response = JsonResponse(answer)
+            response.status_code = 405
+            return response
+        return super().dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         article = get_object_or_404(Article, pk=self.kwargs.get('pk'))
         srl = ArticleSerializer(article)
@@ -53,6 +81,15 @@ class ArticleUpdateView(View):
 
 
 class ArticleCreateView(View):
+    def dispatch(self, request, *args, **kwargs):
+        answer = {}
+        if request.method != 'POST':
+            answer['error 405'] = "Not Allowed Method"
+            response = JsonResponse(answer)
+            response.status_code = 405
+            return response
+        return super().dispatch(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         data = json.loads(request.body)
         slr = ArticleSerializer(data=data)
